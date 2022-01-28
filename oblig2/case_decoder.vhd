@@ -3,14 +3,6 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 architecture CASE_DECODER of DECODER is
-
-  -- component CASE_DECODER
-  --   port (
-  --     sw : in  std_logic_vector(1 downto 0);
-  --     ld : out std_logic_vector(3 downto 0)
-  --   );
-  -- end component;
- 
 begin
   
   DECODE :
