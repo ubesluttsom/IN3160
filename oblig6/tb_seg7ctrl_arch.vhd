@@ -5,7 +5,7 @@ library IEEE;
 entity tb_seg7ctrl is
 end tb_seg7ctrl;
 
-architecture tb of tb_seg7ctrl is
+architecture tb_arch of tb_seg7ctrl is
 
 -------------------------------------
 -- COMPONENT & SIGNAL DECLARATIONS --
@@ -90,7 +90,7 @@ architecture tb of tb_seg7ctrl is
 BEGIN -- STATEMENTS --
 ----------------------
 
-UUT: entity work.seg7ctrl
+UUT: entity work.seg7ctrl(seg7ctrl_arch)
   port map (
     mclk    => tb_mclk,
     reset   => tb_reset,

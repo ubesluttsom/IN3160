@@ -52,15 +52,6 @@ end process;
 
 -- CONCURRENT LOGIC
 
--- Looks (hopefully) something like this:
---      ┌🮢
---   d0─┤🮡🮢    ┌───────┐
---      │ ├─di─┤bin2ssd├─abcdefg
---   d1─┤🮣🮠    └───────┘
---      └🮠
---      │
---      c
-
 with c select 
   di <= d0 when '0',
         d1 when '1',

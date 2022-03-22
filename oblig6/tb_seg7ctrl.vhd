@@ -46,7 +46,7 @@ architecture tb of tb_seg7ctrl is
 BEGIN -- STATEMENTS --
 ----------------------
 
-UUT: entity work.seg7ctrl
+UUT: entity work.seg7ctrl(seg7ctrl)
   port map (
     mclk    => tb_mclk,
     reset   => tb_reset,
