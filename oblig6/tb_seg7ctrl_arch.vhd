@@ -109,23 +109,28 @@ S7M: entity work.seg7model
 -- Generating the clock signal
 tb_mclk <= not tb_mclk after HALF_PERIOD;
 
--- Generating `second_tick` and increment `rom_pos`
+-- Generating `second_tick`.
 process (tb_mclk)
 begin
   if rising_edge(tb_mclk) then
-    if counter = FREQ - 1 /* NOTE: use smaller value for testing */ then
+    if counter = FREQ - 1 then
       second_tick <= '1';
-      counter <= (others => '0');
-      rom_pos <= rom_pos + 1;
-      tb_d0 <= D0_ROM(to_integer(rom_pos));
-      tb_d1 <= D1_ROM(to_integer(rom_pos));
+      counter     <= (others => '0');
     else
       second_tick <= '0';
-      counter <= counter + 1;
-      tb_d0 <= (others => '0');
-      tb_d1 <= (others => '0');
+      counter     <= counter + 1;
     end if;
   end if;
 end process;
 
-end architecture tb;
+-- Display hidden message and increment `rom_pos` on each `second_tick`.
+process (second_tick)
+begin
+  if rising_edge(second_tick) then
+      tb_d0   <= D0_ROM(to_integer(rom_pos));
+      tb_d1   <= D1_ROM(to_integer(rom_pos));
+      rom_pos <= rom_pos + 1;
+  end if;
+end process;
+
+end architecture tb_arch;
