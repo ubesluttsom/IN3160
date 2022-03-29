@@ -11,27 +11,10 @@ header-includes: |
   \usepackage{siunitx}
 ---
 
-### Readme
-
-I did not get far enough to warrant actually programming a Zedboard in the lab,
-so I have no `.do` files to offer. I use \textsc{ghdl} and \textsc{Gtk}Wave on
-my personal computer. If you do too, you can use:
-
-```
-ghdl analyze --std=08 bin2ssd.vhd seg7model_ent.vhd \
-                      seg7model_beh.vhd tb_bin2ssd.vhd \
-                      seg7ctrl.vhd tb_seg7ctrl.vhd
-ghdl elaborate --std=08 tb_bin2ssd
-ghdl elaborate --std=08 tb_seg7ctrl
-ghdl run --std=08 tb_bin2ssd --wave=tb_bin2ssd.ghw
-ghdl run --std=08 tb_seg7ctrl --wave=tb_seg7ctrl.ghw
-```
-
-### Exercises
-
-a) Sample `tb_bin2ssd.vhd` run:
-
-   ![](a.png)
+a) I first implemented `bin2ssd` as an entity, which worked fine, but after
+   feedback from my first attempt I've now changed it to a function wrapped in
+   a package. See `bin2ssd_pck.vhd` for implementation, and `tb_bin2ssd.vhd`
+   for a working test bench^[Unless Canvas screws up the filenames again ...].
 
 b) I chose to alternate the displays at at least \SI{50}{Hz}. I then need to
    calculate the number of \SI{100e6}{Hz} cycles fit in \SI{50}{Hz}, which is
@@ -40,18 +23,32 @@ b) I chose to alternate the displays at at least \SI{50}{Hz}. I then need to
    = 20$, I round down get a faster (rather than slower) counter. More
    precisely, this gives a refresh rate of $\approx \SI{95}{Hz}$.
 
+   Se `seg7ctrl.vhd` for implementation, and `tb_seg7ctrl.vhd` for a working
+   test bench.
+
+   Setting either inputs `d0` or `d1` to `0000` will clear the displays.
+
    A possible schematic of the entity `seg7ctrl` is shown in figure
-   \ref{diagram}. Waveform from a sample `tb_seg7ctrl.vhd` run is shown in figure \ref{b}.
+   \ref{diagram}, at least as I imagine it.
 
    ![Possible schematic of `seg7ctrl`. Reset functionality is not
-   illustrated.\label{diagram}](oblig6.drawio.pdf)
+   illustrated. (_Future me_: this isn't actually far off what Vivado
+   synthesizes the design to!).\label{diagram}](oblig6.drawio.pdf)
 
+c) See `seg7ctrl_arch.vhd`, `self_test_unit.vhd`, `self_test_system.vhd`
+   for implementations, with a test bench in `tb_self_test_system.vhd`.
 
-   ![Waveform of `tb_seg7ctrl.vhd`\label{b}](b.png)
+   First, I misunderstood this as "light up
+   display for one clock cycle once per second", which wouldn't possible be
+   visible to the human eye; and I was somewhat confused on how to factor the
+   code and components, too. Hopefully it's up to spec now, after some guidance
+   from helpful lab supervisors.
 
-c) See files for implementation. One clock cycle is _fast_, one billionth of
-   a second, if I've interpreted correctly. This makes the waveform really
-   unwieldy, and difficult to test. The letters couldn't possibly be legible at
-   this speed?
+d) It's alive! See `constraints.xdc` and `self_test_system.bit` for constraints
+   and bit file, respectively. I was a bit unsure how to include the timing and
+   utilization reports (and had no supervisor on hand), but I've included
+   `timing.rpx` and `utilization_report.txt`, which Vivado allowed me to
+   export. I've also included a video as proof of a functional, programmed
+   board.
 
-d) `TODO!`
+   I read the "hidden" message as: _WELL donE YoU ArE good_.

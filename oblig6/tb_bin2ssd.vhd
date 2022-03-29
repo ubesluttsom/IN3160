@@ -1,6 +1,8 @@
 library IEEE;
   use IEEE.std_logic_1164.all;
   use IEEE.numeric_std.all;
+library work;
+ use work.bin2ssd.all;
 
 entity tb_bin2ssd is
 end tb_bin2ssd;
@@ -10,13 +12,6 @@ architecture tb of tb_bin2ssd is
 -------------------------------------
 -- COMPONENT & SIGNAL DECLERATIONS --
 -------------------------------------
-
-  component bin2ssd is
-    port(
-      bin : in  std_logic_vector(3 downto 0);
-      ssd : out std_logic_vector(6 downto 0)
-    );
-  end component bin2ssd;
 
   component seg7model is 
     port(
@@ -28,7 +23,6 @@ architecture tb of tb_bin2ssd is
   end component seg7model;
 
   signal tb_bin     : std_logic_vector(3 downto 0);
-  signal tb_ssd     : std_logic_vector(6 downto 0);
 
   signal tb_c       : std_logic;
   signal tb_abcdefg : std_logic_vector(6 downto 0);
@@ -39,12 +33,6 @@ architecture tb of tb_bin2ssd is
 BEGIN -- STATEMENTS --
 ----------------------
 
-UUT: entity work.bin2ssd
-  port map (
-    bin => tb_bin,   
-    ssd => tb_ssd
-  );    
-
 S7M: entity work.seg7model
   port map (
     c       => tb_c,
@@ -54,7 +42,7 @@ S7M: entity work.seg7model
   );
 
 
-tb_abcdefg <= tb_ssd;
+tb_abcdefg <= bin2ssd(tb_bin);
 
 process begin
 
