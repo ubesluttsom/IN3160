@@ -9,7 +9,7 @@ entity output_synchronizer is
     en        : in  std_logic;
     dir       : in  std_logic;
     en_synch  : out std_logic;
-    dir_synch : out std_logic;
+    dir_synch : out std_logic
   );  
 end output_synchronizer;
 
@@ -20,10 +20,10 @@ begin
   process (reset, mclk) is    
   begin
     if reset then       
-      en1  <= (others => '0');
-      en2  <= (others => '0');
-      dir1 <= (others => '0');
-      dir2 <= (others => '0');
+      en1  <= '0';
+      en2  <= '0';
+      dir1 <= '0';
+      dir2 <= '0';
     elsif rising_edge(mclk) then
       en1  <= en;
       en2  <= en1;
