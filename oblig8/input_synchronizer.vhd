@@ -9,7 +9,7 @@ entity input_synchronizer is
     SA       : in  std_logic;
     SB       : in  std_logic;
     SA_synch : out std_logic;
-    SB_synch : out std_logic;
+    SB_synch : out std_logic
   );  
 end input_synchronizer;
 
@@ -20,10 +20,10 @@ begin
   process (reset, mclk) is    
   begin
     if reset then       
-      SA1 <= (others => '0');
-      SA2 <= (others => '0');
-      SB1 <= (others => '0');
-      SB2 <= (others => '0');
+      SA1 <= '0';
+      SA2 <= '0';
+      SB1 <= '0';
+      SB2 <= '0';
     elsif rising_edge(mclk) then
       SA1 <= SA;
       SA2 <= SA1;

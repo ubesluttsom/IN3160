@@ -13,7 +13,7 @@ entity self_test_module is
   port (
     mclk       : in  std_logic; -- 100MHz, positive flank
     reset      : in  std_logic;
-    duty_cycle : out std_logic_vector(6 downto 0)
+    duty_cycle : out std_logic_vector(7 downto 0)
   );
 end self_test_module;
 
@@ -46,7 +46,7 @@ BEGIN -- STATEMENTS --
 
 TEST_VALUES: ROM
   generic map(
-    data_width => 7,
+    data_width => 8,
     addr_width => addr'length,
     filename   => "rom_data.txt")
   port map(
