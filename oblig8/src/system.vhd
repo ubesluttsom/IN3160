@@ -10,7 +10,7 @@ entity system is
   port (
     -- MOTOR
     mclk      : in std_logic;
-    reset     : in std_logic := '0';
+    reset     : in std_logic;
     dir_synch : out std_logic;
     en_synch  : out std_logic; 
     -- VELOCITY DISPLAY
@@ -69,8 +69,6 @@ architecture implementation of system is
   signal sys_duty_cycle : std_logic_vector(7 downto 0);
   signal sys_dir        : std_logic;
   signal sys_en         : std_logic;
-  signal sys_dir_synch  : std_logic;
-  signal sys_en_synch   : std_logic;
 
 -- VELOCITY DISPLAY
 
@@ -117,19 +115,15 @@ component seg7ctrl is
   );
 end component seg7ctrl;
 
-signal sys_SA       : std_logic := '0';
-signal sys_SB       : std_logic := '0';
-signal sys_SA_synch : std_logic := '0';
-signal sys_SB_synch : std_logic := '0';
-signal sys_pos_inc  : std_logic := '0';
-signal sys_pos_dec  : std_logic := '0';
-signal sys_velocity : signed(7 downto 0)           := (others => '0');
-signal sys_d0       : std_logic_vector(3 downto 0) := (others => '0');
-signal sys_d1       : std_logic_vector(3 downto 0) := (others => '0');
-signal sys_abcdefg  : std_logic_vector(6 downto 0) := (others => '0');
-signal sys_c        : std_logic := '0';
+signal sys_SA_synch : std_logic;
+signal sys_SB_synch : std_logic;
+signal sys_pos_inc  : std_logic;
+signal sys_pos_dec  : std_logic;
+signal sys_velocity : signed(7 downto 0);
+signal sys_d0       : std_logic_vector(3 downto 0);
+signal sys_d1       : std_logic_vector(3 downto 0);
 
-signal sys_velocity_unsigned : unsigned(7 downto 0) := (others => '0');
+signal sys_velocity_unsigned : unsigned(7 downto 0);
 
 ----------------------
 BEGIN -- STATEMENTS --
@@ -167,8 +161,8 @@ OUTSY: entity work.output_synchronizer
     mclk      => mclk,
     en        => sys_en,
     dir       => sys_dir,
-    en_synch  => sys_en_synch,
-    dir_synch => sys_dir_synch
+    en_synch  => en_synch,
+    dir_synch => dir_synch
   );
 
 -- VELOCITY DISPLAY
@@ -177,8 +171,8 @@ NSYNC: entity work.input_synchronizer
   port map(
     reset    => reset,
     mclk     => mclk,
-    SA       => sys_SA,
-    SB       => sys_SB,
+    SA       => SA,
+    SB       => SB,
     SA_synch => sys_SA_synch,
     SB_synch => sys_SB_synch
   );
@@ -208,8 +202,8 @@ SEG7C: entity work.seg7ctrl
     reset   => reset,
     d0      => sys_d0,
     d1      => sys_d1,
-    abcdefg => sys_abcdefg,
-    c       => sys_c
+    abcdefg => abcdefg,
+    c       => c
   );
 
 sys_velocity_unsigned <= unsigned(abs(sys_velocity));

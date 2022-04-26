@@ -7,13 +7,16 @@ library IEEE;
 entity self_test_module is
   generic(
     -- Defaults to 100 MHz clock frequency. Change every 3 seconds.
-    FREQ    : integer := 100000000;
-    N_TIMES : integer := 3
+    FREQ       : integer := 100000000;
+    N_TIMES    : integer := 3;
+    ROM_LINES  : integer := 20;
+    ADDR_WIDTH : integer := 5;
+    DATA_WIDTH : integer := 8
   );
   port (
     mclk       : in  std_logic; -- 100MHz, positive flank
     reset      : in  std_logic;
-    duty_cycle : out std_logic_vector(7 downto 0)
+    duty_cycle : out std_logic_vector(DATA_WIDTH-1 downto 0)
   );
 end self_test_module;
 
@@ -27,18 +30,20 @@ architecture self_test_module of self_test_module is
   signal second_tick : std_logic := '0';
   signal counter : unsigned(integer(ceil(log2(real(N_TIMES*FREQ))))-1 downto 0)
       := (others => '0');
-  
+
   -- Initializing ROM
   component ROM is
     generic(
-      data_width: natural;
-      addr_width: natural;
-      filename:   string);
+      data_lines : natural;
+      data_width : natural;
+      addr_width : natural;
+      filename   : string);
     port(
       address: in std_logic_vector(addr_width-1 downto 0);
       data:   out std_logic_vector(data_width-1 downto 0));
   end component;
-  signal addr: std_logic_vector(5 downto 0) := (others => '0');
+  signal rom_addr : unsigned(ADDR_WIDTH-1 downto 0) := (others => '0');
+  signal rom_data : std_logic_vector(DATA_WIDTH-1 downto 0) := (others => '0');
   
 ----------------------
 BEGIN -- STATEMENTS --
@@ -46,12 +51,13 @@ BEGIN -- STATEMENTS --
 
 TEST_VALUES: ROM
   generic map(
-    data_width => 8,
-    addr_width => addr'length,
+    data_lines => ROM_LINES,
+    data_width => DATA_WIDTH,
+    addr_width => ADDR_WIDTH,
     filename   => "rom_data.txt")
   port map(
-    address => addr,
-    data => duty_cycle);
+    address => std_logic_vector(rom_addr),
+    data => rom_data);
 
 -- Generating `second_tick`.
 process (mclk, reset)
@@ -70,16 +76,19 @@ begin
   end if;
 end process;
 
--- Increment `addr` on each `second_tick`.
-process (second_tick, reset)
+-- Increment `rom_addr` on each `second_tick`.
+process (mclk, reset)
 begin
   if (reset = '1') then
-    -- Asynchronous reset
-    -- duty_cycle <= (others => '0');
-    addr <= (others => '0');
-  elsif rising_edge(second_tick) then
-      addr <= std_logic_vector(unsigned(addr) + 1);
+    rom_addr <= (others => '0'); -- Asynchronous reset
+  elsif rising_edge(mclk) then
+    if (second_tick = '1') and (rom_addr < ROM_LINES) then
+      rom_addr <= rom_addr + 1;
+    end if;
   end if;
 end process;
+
+-- Set `duty_cycle`.
+duty_cycle <= (others => '0') when (reset = '1') else rom_data;
 
 end architecture self_test_module;
