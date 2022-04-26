@@ -41,6 +41,9 @@ architecture implementation of pulse_width_modulator is
   signal counter : unsigned(integer(ceil(log2(real(FREQ))))-1 downto 0)
       := (others => '0');
 
+  -- Make a scaler to calculate duty cycle counter.
+  constant DUTY_SCALAR : integer := FREQ / 2**(duty_cycle'length - 1);
+
   signal pwm : std_logic := '0';
 
   alias reverse : std_logic is duty_cycle(duty_cycle'high);
@@ -49,7 +52,13 @@ architecture implementation of pulse_width_modulator is
 BEGIN -- STATEMENTS --
 ----------------------
 
-pwm <= '1' when abs(signed(duty_cycle)) < signed(counter) else '0';
+-- Scale the duty cycle signal so that it's max value is comarable to the max
+-- `counter` value. Then, keep `pwm` hot while the `counter` is within the duty
+-- cycle's active region. This calculation gives some warnings about casting. I
+-- didn't have time to find a better solution, but it works as is.
+pwm <= '0' when unsigned(duty_cycle) = 0 else
+       '1' when signed(counter) < abs(signed(duty_cycle) * DUTY_SCALAR) else
+       '0';
 
 COUNTER_LOGIC:
 process (mclk, reset)
@@ -69,8 +78,8 @@ NEXT_STATE_LOGIC:
 process(reverse, current_state) is
 begin
   case current_state is
-    when S_REVERSE_IDLE => next_state <= S_REVERSE when     reverse else S_REVERSE_IDLE;
-    when S_REVERSE =>      next_state <= S_REVERSE when     reverse else S_FORWARD_IDLE;
+    when S_REVERSE =>      next_state <= S_REVERSE when     reverse else S_REVERSE_IDLE;
+    when S_REVERSE_IDLE => next_state <= S_REVERSE when     reverse else S_FORWARD_IDLE;
     when S_FORWARD_IDLE => next_state <= S_FORWARD when not reverse else S_REVERSE_IDLE;
     when S_FORWARD =>      next_state <= S_FORWARD when not reverse else S_FORWARD_IDLE;
   end case;
