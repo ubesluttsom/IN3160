@@ -211,7 +211,7 @@ SEG7C: entity work.seg7ctrl
 
 -- PS-SYSTEM
 gpio  <= sys_duty_cycle;
-gpio2 <= sys_velocity;
+gpio2 <= std_logic_vector(sys_velocity);
 
 sys_velocity_unsigned <= unsigned(abs(sys_velocity));
 sys_d0 <= std_logic_vector(sys_velocity_unsigned(7 downto 4));
